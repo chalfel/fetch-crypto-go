@@ -1,6 +1,7 @@
 module github.com/chalfel/fetch-crypto-go
 
 require github.com/jackc/pgx/v4 v4.14.1
+// +heroku goVersion go1.17
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
