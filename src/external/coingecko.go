@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"time"
 )
@@ -65,28 +66,53 @@ func (c *CoinGecko) ListCrypto() ([]ListCryptoObject, error) {
 	}
 	return cryptoListArray, nil
 }
+func (c *CoinGecko) GetCoinMarket(page int, allCryptoMarketArray *[]CoinGeckoCrypto) {
 
-func (c *CoinGecko) GetAllMarketInfo() []CoinGeckoCrypto {
-	stop := false
-	allCryptoMarketArray := []CoinGeckoCrypto{}
-	page := 1
-	for !stop {
-		response, err := httpClient.Get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&price_change_percentage=1h&per_page=250&page=" + fmt.Sprint(page))
-		if err != nil {
-			log.Println(err)
-		}
-		defer response.Body.Close()
-		cryptoMarketArray := []CoinGeckoCrypto{}
-		err = json.NewDecoder(response.Body).Decode(&cryptoMarketArray)
-		if err != nil {
-			log.Println(err)
-		}
-		if len(cryptoMarketArray) == 0 {
-			stop = true
-		} else {
-			allCryptoMarketArray = append(allCryptoMarketArray, cryptoMarketArray...)
-			page = page + 1
-		}
+	response, err := httpClient.Get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&price_change_percentage=1h&per_page=250&page=" + fmt.Sprint(page))
+	if err != nil {
+		log.Println(err)
 	}
+	defer response.Body.Close()
+	cryptoMarketArray := []CoinGeckoCrypto{}
+	err = json.NewDecoder(response.Body).Decode(&cryptoMarketArray)
+	if err != nil {
+		fmt.Println(err)
+	}
+	*allCryptoMarketArray = append(*allCryptoMarketArray, cryptoMarketArray...)
+
+}
+func (c *CoinGecko) GetAllMarketInfo() []CoinGeckoCrypto {
+	cryptoArr, err := c.ListCrypto()
+	if err != nil {
+		log.Println(err)
+	}
+	cryptoPages := math.Ceil(float64(len(cryptoArr)) / float64(250))
+
+	allCryptoMarketArray := make([]CoinGeckoCrypto, len(cryptoArr))
+	for i := 0; i < int(cryptoPages); i++ {
+		go c.GetCoinMarket(i, &allCryptoMarketArray)
+	}
+
+	// page := 1
+	// stop := false
+	// allCryptoMarketArray := []CoinGeckoCrypto{}
+	// for !stop {
+	// 	response, err := httpClient.Get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&price_change_percentage=1h&per_page=250&page=" + fmt.Sprint(page))
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 	}
+	// 	defer response.Body.Close()
+	// 	cryptoMarketArray := []CoinGeckoCrypto{}
+	// 	err = json.NewDecoder(response.Body).Decode(&cryptoMarketArray)
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 	}
+	// 	if len(cryptoMarketArray) == 0 {
+	// 		stop = true
+	// 	} else {
+	// 		allCryptoMarketArray = append(allCryptoMarketArray, cryptoMarketArray...)
+	// 		page = page + 1
+	// 	}
+	// }
 	return allCryptoMarketArray
 }
