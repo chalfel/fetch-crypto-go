@@ -19,6 +19,7 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 	cryptos := fc.CoinGeckoClient.GetAllMarketInfo()
 	_, err := fc.CryptoMongoRepository.InsertMany(ctx, cryptos)
 
+	fmt.Println(cryptos)
 	if err != nil {
 		return err
 	}

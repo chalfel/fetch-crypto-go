@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -66,8 +67,8 @@ func (c *CoinGecko) ListCrypto() ([]ListCryptoObject, error) {
 	}
 	return cryptoListArray, nil
 }
-func (c *CoinGecko) GetCoinMarket(page int, allCryptoMarketArray *[]CoinGeckoCrypto) {
-
+func (c *CoinGecko) GetCoinMarket(wg *sync.WaitGroup, page int, allCryptoMarketArray *[]CoinGeckoCrypto) {
+	defer wg.Done()
 	response, err := httpClient.Get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&price_change_percentage=1h&per_page=250&page=" + fmt.Sprint(page))
 	if err != nil {
 		log.Println(err)
@@ -78,10 +79,12 @@ func (c *CoinGecko) GetCoinMarket(page int, allCryptoMarketArray *[]CoinGeckoCry
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	*allCryptoMarketArray = append(*allCryptoMarketArray, cryptoMarketArray...)
 
 }
 func (c *CoinGecko) GetAllMarketInfo() []CoinGeckoCrypto {
+	wg := &sync.WaitGroup{}
 	cryptoArr, err := c.ListCrypto()
 	if err != nil {
 		log.Println(err)
@@ -89,30 +92,14 @@ func (c *CoinGecko) GetAllMarketInfo() []CoinGeckoCrypto {
 	cryptoPages := math.Ceil(float64(len(cryptoArr)) / float64(250))
 
 	allCryptoMarketArray := make([]CoinGeckoCrypto, len(cryptoArr))
-	for i := 0; i < int(cryptoPages); i++ {
-		go c.GetCoinMarket(i, &allCryptoMarketArray)
+
+	wg.Add(int(cryptoPages))
+
+	for i := 1; i <= int(cryptoPages); i++ {
+		go c.GetCoinMarket(wg, i, &allCryptoMarketArray)
 	}
 
-	// page := 1
-	// stop := false
-	// allCryptoMarketArray := []CoinGeckoCrypto{}
-	// for !stop {
-	// 	response, err := httpClient.Get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&price_change_percentage=1h&per_page=250&page=" + fmt.Sprint(page))
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// 	defer response.Body.Close()
-	// 	cryptoMarketArray := []CoinGeckoCrypto{}
-	// 	err = json.NewDecoder(response.Body).Decode(&cryptoMarketArray)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// 	if len(cryptoMarketArray) == 0 {
-	// 		stop = true
-	// 	} else {
-	// 		allCryptoMarketArray = append(allCryptoMarketArray, cryptoMarketArray...)
-	// 		page = page + 1
-	// 	}
-	// }
+	wg.Wait()
+
 	return allCryptoMarketArray
 }
