@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chalfel/fetch-crypto-go/src/crypto"
 	"github.com/chalfel/fetch-crypto-go/src/external"
