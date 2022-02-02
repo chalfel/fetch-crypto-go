@@ -45,7 +45,6 @@ func main() {
 			c.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
-		fmt.Println(cryptoTrack)
 		resp, err := createCryptoTrack.Create(ctx, cryptoTrack)
 		if err != nil {
 			c.JSON(400, gin.H{"message": err.Error()})

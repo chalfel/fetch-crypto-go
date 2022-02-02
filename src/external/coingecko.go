@@ -91,8 +91,7 @@ func (c *CoinGecko) GetAllMarketInfo() []CoinGeckoCrypto {
 	}
 	cryptoPages := math.Ceil(float64(len(cryptoArr)) / float64(250))
 
-	allCryptoMarketArray := make([]CoinGeckoCrypto, len(cryptoArr))
-
+	allCryptoMarketArray := make([]CoinGeckoCrypto, 0)
 	wg.Add(int(cryptoPages))
 
 	for i := 1; i <= int(cryptoPages); i++ {

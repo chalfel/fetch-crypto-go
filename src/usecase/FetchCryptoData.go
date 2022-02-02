@@ -19,7 +19,6 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 	cryptos := fc.CoinGeckoClient.GetAllMarketInfo()
 	_, err := fc.CryptoMongoRepository.InsertMany(ctx, cryptos)
 
-	fmt.Println(cryptos)
 	if err != nil {
 		return err
 	}
@@ -42,7 +41,6 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 			Percentage: percentage,
 			Value:      value,
 		}
-		fmt.Println(sendDTO)
 		fc.SendGrid.Send(sendDTO)
 	}
 	return err

@@ -2,7 +2,6 @@ package crypto
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chalfel/fetch-crypto-go/src/external"
 	"go.mongodb.org/mongo-driver/bson"
@@ -39,6 +38,5 @@ func (cm *CryptoMongoRepository) FindById(ctx context.Context, id string) ([]ext
 	if err = response.All(context.TODO(), &decodedCryptoDocuments); err != nil {
 		return nil, err
 	}
-	fmt.Println(decodedCryptoDocuments)
 	return decodedCryptoDocuments, nil
 }

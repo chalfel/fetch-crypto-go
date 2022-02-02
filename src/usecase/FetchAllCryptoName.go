@@ -18,7 +18,6 @@ func (fa *FetchAllCryptoNameUsecase) Fetch(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(geckoCryptos)
 	cryptos := []crypto.Crypto{}
 	for _, geckoCrypto := range geckoCryptos {
 		crypto := crypto.Crypto{Id: geckoCrypto.Id, Name: geckoCrypto.Name, Symbol: geckoCrypto.Symbol}
