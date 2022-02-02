@@ -43,7 +43,6 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 			Value:      value,
 		}
 		err = fc.SendGrid.Send(sendDTO)
-		return err
 	}
 	return err
 
