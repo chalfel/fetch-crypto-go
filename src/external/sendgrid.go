@@ -2,7 +2,6 @@ package external
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/sendgrid/sendgrid-go"
@@ -17,7 +16,7 @@ type SendDTO struct {
 	Value      float64
 }
 
-func (sg *SendGrid) Send(payload SendDTO) {
+func (sg *SendGrid) Send(payload SendDTO) error {
 	from := mail.NewEmail("Crypto Tracing", "contato@piperapp.co")
 	subject := "CryptoTracking - " + fmt.Sprint(payload.CryptoId)
 	to := mail.NewEmail(payload.Email, payload.Email)
@@ -27,10 +26,11 @@ func (sg *SendGrid) Send(payload SendDTO) {
 	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	response, err := client.Send(message)
 	if err != nil {
-		log.Println(err)
+		return err
 	} else {
 		fmt.Println(response.StatusCode)
 		fmt.Println(response.Body)
 		fmt.Println(response.Headers)
 	}
+	return nil
 }

@@ -42,7 +42,8 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 			Percentage: percentage,
 			Value:      value,
 		}
-		fc.SendGrid.Send(sendDTO)
+		err = fc.SendGrid.Send(sendDTO)
+		return err
 	}
 	return err
 
