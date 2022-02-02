@@ -60,7 +60,9 @@ func main() {
 			SendGrid:              external.SendGrid{},
 		}
 		err := fetchCryptoData.Fetch(ctx)
-		fmt.Println(err)
+		if err != nil {
+			c.JSON(400, gin.H{"message": err})
+		}
 		c.JSON(200, gin.H{"message": "Message fetched"})
 	})
 
@@ -89,5 +91,6 @@ func main() {
 		}
 		c.JSON(200, gin.H{"data": resp})
 	})
+
 	r.Run(":" + os.Getenv("PORT"))
 }
