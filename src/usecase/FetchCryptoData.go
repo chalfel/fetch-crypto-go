@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 
 	"github.com/chalfel/fetch-crypto-go/src/crypto"
 	"github.com/chalfel/fetch-crypto-go/src/external"
@@ -26,6 +27,7 @@ func (fc *FetchCryptoDataUsecase) Fetch(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Println(cryptoTrackings)
 	for _, track := range cryptoTrackings {
 		var percentage, value float64
 		for _, crypto := range cryptos {
