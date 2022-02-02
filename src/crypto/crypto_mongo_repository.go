@@ -2,9 +2,11 @@ package crypto
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/chalfel/fetch-crypto-go/src/external"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -56,4 +58,21 @@ func (cm *CryptoMongoRepository) InsertAllCryptosName(ctx context.Context, crypt
 	}
 
 	return cryptos, nil
+}
+
+func (cm *CryptoMongoRepository) SearchByName(ctx context.Context, name string) ([]Crypto, error) {
+	regexPattern := fmt.Sprintf(".*%s.*", name)
+	filter := bson.D{primitive.E{Key: "name", Value: primitive.Regex{Pattern: regexPattern, Options: ""}}}
+
+	response, err := cm.Client.Database("default").Collection("crypto_name").Find(ctx, filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var decodedCryptoDocuments []Crypto
+	if err = response.All(ctx, &decodedCryptoDocuments); err != nil {
+		return nil, err
+	}
+	return decodedCryptoDocuments, nil
 }

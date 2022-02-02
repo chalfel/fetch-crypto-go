@@ -7,11 +7,11 @@ import (
 )
 
 type GetAllCryptoNameUsecase struct {
-	CryptoRepository crypto.CryptoRepository
+	CryptoMongoRepository crypto.CryptoMongoRepository
 }
 
 func (fa *GetAllCryptoNameUsecase) GetAll(ctx context.Context, name string) ([]crypto.Crypto, error) {
-	resp, err := fa.CryptoRepository.GetAll(ctx, name)
+	resp, err := fa.CryptoMongoRepository.SearchByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}
