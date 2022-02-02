@@ -62,6 +62,7 @@ func main() {
 		err := fetchCryptoData.Fetch(ctx)
 		if err != nil {
 			c.JSON(400, gin.H{"message": err})
+			return
 		}
 		c.JSON(200, gin.H{"message": "Message fetched"})
 	})
