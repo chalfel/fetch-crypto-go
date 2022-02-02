@@ -2,6 +2,8 @@ package crypto
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -35,8 +37,21 @@ func (cr *CryptoRepository) CleanAndInsert(ctx context.Context, cryptos []Crypto
 	if err != nil {
 		return err
 	}
-	for _, crypto := range cryptos {
-		tx.QueryRow(ctx, "insert into crypto (id, name, symbol) values ($1, $2, $3)", &crypto.Id, &crypto.Name, &crypto.Symbol).Scan()
+	valueStrings := []string{}
+	valueArgs := []interface{}{}
+
+	for i, crypto := range cryptos {
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d)", i*3+1, i*3+2, i*3+3))
+
+		valueArgs = append(valueArgs, crypto.Id)
+		valueArgs = append(valueArgs, crypto.Name)
+		valueArgs = append(valueArgs, crypto.Symbol)
+	}
+
+	stmt := fmt.Sprintf("INSERT INTO crypto (id, name, symbol) VALUES %s", strings.Join(valueStrings, ","))
+	_, err = tx.Exec(ctx, stmt, valueArgs...)
+	if err != nil {
+		return err
 	}
 	err = tx.Commit(ctx)
 	return err

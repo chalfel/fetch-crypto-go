@@ -64,20 +64,18 @@ func main() {
 		c.JSON(200, gin.H{"message": "Message fetched"})
 	})
 
-	r.GET("/sendEmail", func(c *gin.Context) {
-		test := crypto.CryptoTrackRepository{Db: conn}
-		resp, _ := test.GetAll(ctx)
-		fmt.Println(resp)
-		sendDto := external.SendDTO{CryptoId: "bitcoin", Email: "caiohalcsik@gmail.com", Percentage: 20.0, Value: 20.0}
-		sendGrid := external.SendGrid{}
-		sendGrid.Send(sendDto)
-	})
-	r.GET("/fetchCryptoName", func(c *gin.Context) {
+	r.GET("/crypto/name", func(c *gin.Context) {
 		cryptoRepository := crypto.CryptoRepository{Db: conn}
 		fetchAllCryptoNameUsecase := usecase.FetchAllCryptoNameUsecase{CoinGecko: external.CoinGecko{}, CryptoRepository: cryptoRepository}
 		err := fetchAllCryptoNameUsecase.Fetch(ctx)
 		fmt.Println(err)
+		if err != nil {
+			c.JSON(400, gin.H{"message": err})
+			return
+		}
+		c.JSON(200, gin.H{"message": "Crypto name is fetched"})
 	})
+
 	r.GET("/crypto/all", func(c *gin.Context) {
 		name, sent := c.GetQuery("name")
 		if !sent {
