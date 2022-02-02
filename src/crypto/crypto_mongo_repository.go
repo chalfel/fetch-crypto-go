@@ -40,3 +40,20 @@ func (cm *CryptoMongoRepository) FindById(ctx context.Context, id string) ([]ext
 	}
 	return decodedCryptoDocuments, nil
 }
+
+func (cm *CryptoMongoRepository) InsertAllCryptosName(ctx context.Context, cryptos []Crypto) ([]Crypto, error) {
+	_, err := cm.Client.Database("default").Collection("crypto_name").DeleteMany(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	documents := make([]interface{}, len(cryptos))
+	for i, crypto := range cryptos {
+		documents[i] = crypto
+	}
+	_, err = cm.Client.Database("default").Collection("crypto_name").InsertMany(ctx, documents)
+	if err != nil {
+		return nil, err
+	}
+
+	return cryptos, nil
+}

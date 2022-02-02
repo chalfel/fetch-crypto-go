@@ -8,8 +8,8 @@ import (
 )
 
 type FetchAllCryptoNameUsecase struct {
-	CoinGecko        external.CoinGecko
-	CryptoRepository crypto.CryptoRepository
+	CoinGecko             external.CoinGecko
+	CryptoMongoRepository crypto.CryptoMongoRepository
 }
 
 func (fa *FetchAllCryptoNameUsecase) Fetch(ctx context.Context) error {
@@ -22,6 +22,6 @@ func (fa *FetchAllCryptoNameUsecase) Fetch(ctx context.Context) error {
 		crypto := crypto.Crypto{Id: geckoCrypto.Id, Name: geckoCrypto.Name, Symbol: geckoCrypto.Symbol}
 		cryptos = append(cryptos, crypto)
 	}
-	err = fa.CryptoRepository.CleanAndInsert(ctx, cryptos)
+	_, err = fa.CryptoMongoRepository.InsertAllCryptosName(ctx, cryptos)
 	return err
 }

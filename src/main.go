@@ -33,6 +33,7 @@ func main() {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_URL")))
 	cryptoMongoRepository := crypto.CryptoMongoRepository{Client: *client}
+	cryptoRepository := crypto.CryptoRepository{Db: conn}
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -65,8 +66,7 @@ func main() {
 	})
 
 	r.GET("/crypto/name", func(c *gin.Context) {
-		cryptoRepository := crypto.CryptoRepository{Db: conn}
-		fetchAllCryptoNameUsecase := usecase.FetchAllCryptoNameUsecase{CoinGecko: external.CoinGecko{}, CryptoRepository: cryptoRepository}
+		fetchAllCryptoNameUsecase := usecase.FetchAllCryptoNameUsecase{CoinGecko: external.CoinGecko{}, CryptoMongoRepository: cryptoMongoRepository}
 		err := fetchAllCryptoNameUsecase.Fetch(ctx)
 		fmt.Println(err)
 		if err != nil {
@@ -82,7 +82,6 @@ func main() {
 			c.JSON(400, gin.H{"message": "name parameter is required"})
 		}
 		fmt.Println(name)
-		cryptoRepository := crypto.CryptoRepository{Db: conn}
 		getAllSavedCryptoName := usecase.GetAllCryptoNameUsecase{CryptoRepository: cryptoRepository}
 		resp, err := getAllSavedCryptoName.GetAll(ctx, name)
 		if err != nil {
