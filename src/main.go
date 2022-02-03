@@ -100,7 +100,7 @@ func main() {
 		}
 		err := trackCryptoUsecase.Track(ctx)
 		if err != nil {
-			c.JSON(400, gin.H{"message": err})
+			c.JSON(400, gin.H{"message": err.Error()})
 			return
 		}
 		c.JSON(200, gin.H{"message": "E-mail sent"})
