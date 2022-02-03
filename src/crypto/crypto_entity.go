@@ -1,5 +1,7 @@
 package crypto
 
+import "time"
+
 type Crypto struct {
 	Id     string
 	Name   string
@@ -10,6 +12,6 @@ type CryptoTrack struct {
 	Id        string
 	CryptoId  string
 	UserEmail string
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
