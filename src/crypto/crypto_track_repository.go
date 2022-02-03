@@ -24,7 +24,7 @@ func (cr *CryptoTrackRepository) GetAll(ctx context.Context) ([]CryptoTrack, err
 	rows, err := cr.Db.Query(ctx, "SELECT * from crypto_track")
 	for rows.Next() {
 		crypto := CryptoTrack{}
-		err := rows.Scan(&crypto.Id, &crypto.CryptoId, &crypto.UserEmail)
+		err := rows.Scan(&crypto.Id, &crypto.CryptoId, &crypto.UserEmail, &crypto.CreatedAt, &crypto.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}

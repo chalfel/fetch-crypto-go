@@ -10,4 +10,6 @@ type CryptoTrack struct {
 	Id        string
 	CryptoId  string
 	UserEmail string
+	CreatedAt string
+	UpdatedAt string
 }
