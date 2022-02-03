@@ -2,14 +2,15 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chalfel/fetch-crypto-go/src/crypto"
+	"github.com/chalfel/fetch-crypto-go/src/external"
 )
 
 type TrackCryptoUsecase struct {
 	CryptoMongoRepository crypto.CryptoMongoRepository
 	CryptoTrackRepository crypto.CryptoTrackRepository
+	SendGrid              external.SendGrid
 }
 
 func (tc *TrackCryptoUsecase) Track(ctx context.Context) error {
@@ -22,9 +23,19 @@ func (tc *TrackCryptoUsecase) Track(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		for _, mongoCrypto := range mongoCryptos {
-			fmt.Println(mongoCrypto)
+		var percentage, value float64
+		percentage = mongoCryptos[0].PriceChangePercentage1hInCurrency
+		value = mongoCryptos[0].CurrentPrice
+		sendDTO := external.SendDTO{
+			CryptoId:   crypto.CryptoId,
+			Email:      crypto.UserEmail,
+			Percentage: percentage,
+			Value:      value,
+		}
+		err = tc.SendGrid.Send(sendDTO)
+		if err != nil {
+			return err
 		}
 	}
-	return nil
+	return err
 }

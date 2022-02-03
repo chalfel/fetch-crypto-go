@@ -70,7 +70,6 @@ func main() {
 	r.GET("/crypto/name", func(c *gin.Context) {
 		fetchAllCryptoNameUsecase := usecase.FetchAllCryptoNameUsecase{CoinGecko: external.CoinGecko{}, CryptoMongoRepository: cryptoMongoRepository}
 		err := fetchAllCryptoNameUsecase.Fetch(ctx)
-		fmt.Println(err)
 		if err != nil {
 			c.JSON(400, gin.H{"message": err})
 			return
@@ -91,6 +90,20 @@ func main() {
 			return
 		}
 		c.JSON(200, gin.H{"data": resp})
+	})
+
+	r.GET("/crypto/send-email", func(c *gin.Context) {
+		trackCryptoUsecase := usecase.TrackCryptoUsecase{
+			CryptoMongoRepository: cryptoMongoRepository,
+			CryptoTrackRepository: crypto.CryptoTrackRepository{Db: conn},
+			SendGrid:              external.SendGrid{},
+		}
+		err := trackCryptoUsecase.Track(ctx)
+		if err != nil {
+			c.JSON(400, gin.H{"message": err})
+			return
+		}
+		c.JSON(200, gin.H{"message": "E-mail sent"})
 	})
 
 	r.Run(":" + os.Getenv("PORT"))
